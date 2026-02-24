@@ -1,0 +1,33 @@
+name: LibJS V Tests
+
+on: [push, pull_request]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: V Tests (${{ matrix.os }})
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: Linux
+            runner: ubuntu-latest
+          - os: macOS
+            runner: macos-latest
+          - os: Windows
+            runner: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install V
+        uses: vlang/setup-v@v1.4
+        with:
+          check-latest: true
+
+      - name: Run tests
+        run: v test .
